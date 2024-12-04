@@ -11,5 +11,5 @@ urlpatterns = [
     path('verifier_heures/<str:code>/', views.verifier_heures, name='verifier_heures'),
     path('taches-effectues', views.tache_effectue, name='tache_effectue'),
     path('rapport/<str:code>/', views.faire_rapport, name='faire_rapport'),
-    path('ajouter-piece-utilisee/<str:code>/', views.ajouter_piece_utilisee, name='ajouter_piece_utilisee'),
+path('ajouter-piece-utilisee/<str:code>/', views.ajouter_piece_utilisee, name='ajouter_piece_utilisee'),
 ]
