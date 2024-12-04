@@ -1,0 +1,20 @@
+<div class="mt-2"> 
+    {{ piece_formset.management_form }} 
+    {% for form in piece_formset %}
+    {% load crispy_forms_tags %}
+    <div class="row">
+        <div class="col-4 col-md-3">
+            <label for="{{form.nom.id_for_label}}">{{ form.nom.label }}</label>
+            {{ form.nom }}
+        </div>
+        <div class="col-4 col-md-3">
+            <label for="{{form.nombre_utilisee.id_for_label}}">{{ form.nombre_utilisee.label }}</label>
+            {{ form.nombre_utilisee }}
+        </div>
+        <div class="col-4 align-self-end">
+            <label for="{{form.etat.id_for_label}}">{{ form.etat.label }}</label>
+            {{ form.etat }}
+        </div>
+    </div>  
+    {% endfor %} 
+</div>

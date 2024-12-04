@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block mains %}
+
+<div class="col-md-4"></div>
+<div class="col-md-4"  style="margin: auto; margin-top: 30px;">
+    <div class="card">
+		<div class="card-body">
+            <div class="card-title">
+                <H2>Authentifiez-vous</H2>
+            </div>   
+            {% include 'partials/_messages.html' %}
+            {% load crispy_forms_tags %}
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary btn-primary-sm">Connecter</button>
+            </form>         
+            
+        </div>
+        {% if group_name == "Maintenance" %}
+        <h3>Fonctionnalités de Maintenance</h3>
+        <ul class="list-group">
+            <li class="list-group-item">Réparer une panne</li>
+            <li class="list-group-item">Gérer les équipements</li>
+        </ul>
+        {% elif group_name == "Production" %}
+            <h3>Fonctionnalités de Producteur</h3>
+            <ul class="list-group">
+                <li class="list-group-item">Suivi de production</li>
+                <li class="list-group-item">Statistiques des rendements</li>
+            </ul>
+        {% elif group_name == "Administration" %}
+            <h3>Fonctionnalités d'Administrateur</h3>
+            <ul class="list-group">
+                <li class="list-group-item">Gestion des utilisateurs</li>
+                <li class="list-group-item">Paramètres avancés</li>
+            </ul>
+        {% else %}
+        <h1>ok</h1>
+        {% endif %}
+</div>
+    </div>
+</div>    
+<div class="col-md-4"></div>
+
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "maintenance.html" %}
+
+{% block content %}
+
+<div class="container">
+    <h1 style="color: #113A60;">Maintenance</h1>
+    <div data-mdb-input-init style="max-width: 150px; margin-top: 50px;" class="form-outline mb-4">
+        <input type="text" onkeyup="rechercherDansTable()" class="form-control bg-white py-3" id="recherche" />
+        <label class="form-label py-3" style="font-size: 20px;" for="datatable-search-input">Search</label>
+    </div>
+    <div class="table-responsive">
+        <table id="tableDonnees" class="table table-warning" style="max-width: 300px;">
+            <thead>
+                <tr>
+                    {% for col in donnees.columns %}
+                        <th style="background-color: #113A60;font-size: 25px; color: #fff;">{{ col }}</th>
+                    {% endfor %}
+                    <th style="background-color: #113A60;font-size: 25px; color: #fff;">DÉMARRER</th>
+                    <th style="background-color: #113A60;font-size: 25px; color: #fff;">FINIR</th>
+                    <th style="background-color: #113A60;font-size: 25px; color: #fff;">RAPPORT</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in donnees.iterrows %}
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <tr>
+                        {% for item in row %}
+                            <td style="color: #113A60; font-size: 22px;" data-code="{{ item }}">                                
+                                <a href="{% url 'runwork' item %}">{{ item }}</a>
+                            </td>
+                        {% endfor %}
+                        <td style="color: #113A60; font-size: 22px;">      
+                          {% with orderwork=interventions_dict|default:"" %}
+                            {% if orderwork.heure_debut %}
+                              <button class="btn btn-success" disabled>Début: {{ ordretravail.heure_debut }}</button> 
+                            {% else %}
+                              <button class="btn btn-success" onclick="activerHeureFin(this)">Début</button> 
+                            {% endif %}
+                            {% endwith %}
+                        </td> 
+                        <td style="color: #113A60; font-size: 22px;"> 
+                          {% with orderwork=interventions_dict|default:"" %}
+                            {% if orderwork.heure_fin %}
+                              <button class="btn btn-danger heure-fin disabled-button" disabled>Fin: {{ ordretravail.heure_fin }}</button>
+                            {% else %}
+                              <button class="btn btn-danger heure-fin disabled-button" disabled onclick="desactiverHeureFin(this)">Fin</button> 
+                            {% endif %}
+                          {% endwith %}
+                        </td>
+                        <td style="color: #113A60; font-size: 22px;">
+                            <button class="btn btn-warning editer disabled-button" disabled onclick="editerRapport(this)">Éditer</button> 
+                        </td>            
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function activerHeureFin(btnDebut) {
+        console.log("Bouton 'Début' cliqué");
+        var row = btnDebut.closest('tr');
+        var btnFin = row.querySelector('.heure-fin');
+        var codeElement = row.querySelector('[data-code]');
+    
+        if (codeElement) {
+            var code = codeElement.innerText; // Récupérer le code
+            console.log("Code récupéré:", code);  // Débogage
+            var dateDebut = new Date();
+            btnDebut.innerHTML = "Début: " + dateDebut.toLocaleString();
+            btnDebut.disabled = true;
+            btnDebut.classList.add('disabled-button');
+    
+            // Envoyer l'heure de début au serveur
+            fetch(`/enregistrer_heure_debut/${code}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'heure_debut': dateDebut.toISOString() })
+            }).then(response => response.json()).then(data => {
+                console.log("Réponse du serveur:", data);  // Débogage
+                if (data.status === 'ok') {
+                    setTimeout(function () {
+                        btnFin.disabled = false;
+                        btnFin.classList.remove('disabled-button');
+                    }, 1 * 60 * 1000); // 1 minute en millisecondes
+                } else if (data.status === 'existe') {
+                    btnDebut.innerHTML = "Début: " + new Date(data.heure_debut).toLocaleString();
+                    btnDebut.disabled = true;
+                    btnDebut.classList.add('disabled-button');
+                }
+            });
+        } else {
+            console.error("Élément avec data-code introuvable.");
+        }
+    }
+    
+    function desactiverHeureFin(btnFin) {
+        console.log("Bouton 'Fin' cliqué");  // Débogage
+        var row = btnFin.closest('tr');
+        var codeElement = row.querySelector('[data-code]');
+    
+        if (codeElement) {
+            var code = codeElement.innerText; // Récupérer le code
+            console.log("Code récupéré:", code);  // Débogage
+            var dateFin = new Date();
+            btnFin.innerHTML = "Fin: " + dateFin.toLocaleString();
+            btnFin.disabled = true;
+            btnFin.classList.add('disabled-button');
+    
+            // Envoyer l'heure de fin au serveur
+            fetch(`/enregistrer_heure_fin/${code}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'heure_fin': dateFin.toISOString() })
+            }).then(response => response.json()).then(data => {
+                console.log("Réponse du serveur:", data);  // Débogage
+                if (data.status === 'ok') {
+                    // Bouton Fin désactivé après enregistrement réussi
+                } else if (data.status === 'existe') {
+                    btnFin.innerHTML = "Fin: " + new Date(data.heure_fin).toLocaleString();
+                    btnFin.disabled = true;
+                    btnFin.classList.add('disabled-button');
+                }
+            });
+        } else {
+            console.error("Élément avec data-code introuvable.");
+        }
+    }
+    
+    // Fonction pour vérifier et désactiver les boutons "Début" et "Fin" si les heures respectives existent
+    function verifierEtDesactiverBoutons() {
+        document.querySelectorAll('tr').forEach(row => {
+            var codeElement = row.querySelector('[data-code]');
+    
+            if (codeElement) {
+                var code = codeElement.innerText; // Récupérer le code
+                fetch(`/verifier_heures/${code}/`, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => response.json()).then(data => {
+                    var btnDebut = row.querySelector('.btn-success');
+                    var btnFin = row.querySelector('.btn-danger.heure-fin');
+                    console.log("Données vérifiées:", data);  // Débogage
+                    if (data.heure_debut) {
+                        btnDebut.innerHTML = "Début: " + new Date(data.heure_debut).toLocaleString();
+                        btnDebut.disabled = true;
+                        btnDebut.classList.add('disabled-button');
+                        if (data.first_user === "{{ user.username }}") {
+                            btnFin.disabled = false;
+                            btnFin.classList.remove('disabled-button');
+                        } else {
+                            btnFin.disabled = true;
+                            btnFin.classList.add('disabled-button');
+                        }
+                    }
+                    if (data.heure_fin) {
+                        btnFin.innerHTML = "Fin: " + new Date(data.heure_fin).toLocaleString();
+                        btnFin.disabled = true;
+                        btnFin.classList.add('disabled-button');
+                    }
+                });
+            } else {
+                console.error("Élément avec data-code introuvable dans la ligne.");
+            }
+        });
+    }
+    
+    // Appel de la fonction pour vérifier et désactiver les boutons au chargement de la page
+    document.addEventListener('DOMContentLoaded', verifierEtDesactiverBoutons);
+    </script>
+      
+
+
+{% endblock %}

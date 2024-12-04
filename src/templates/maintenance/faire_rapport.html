@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block mains %}
+<div class="col-md"  style="margin: auto; margin-top: 30px;">
+    <div class="card">
+		<div class="card-body">
+            <div class="card-title text-center">
+                <h1>Rapport pour l'Intervention</h1>
+                <p>{{ orderwork.code }}</p>
+            </div>   
+            <form method="post" class="mt-4">
+                {% csrf_token %} 
+                {{ form|crispy }}
+
+            <h5 class="mt-4">Pièces Utilisées</h2> 
+            <button class="btn btn-secondary mb-2" hx-get="{% url 'ajouter_piece_utilisee' orderwork.code %}" hx-target="#piece-utilisee-container" hx-swap="beforeend">Ajouter une Pièce</button>
+            <div id="piece-utilisee-container" class="row g-3"> 
+                <!-- HTMX va charger ici --> 
+            </div>
+                {{ piece_formset.management_form }} 
+                {% for form in piece_formset %} 
+                    <div class="row text-center">
+                        <div class="col-4 col-md-3">
+                            <label for="{{form.nom.id_for_label}}">{{ form.nom.label }}</label>
+                            {{ form.nom }}
+                        </div>
+                        <div class="col-3 align-self-end">
+                            <label for="{{form.nombre_utilisee.id_for_label}}">{{ form.nombre_utilisee.label }}</label>
+                            {{ form.nombre_utilisee }}
+                        </div>
+                        <div class="col-3 align-self-end">
+                            <label for="{{form.etat.id_for_label}}">{{ form.etat.label }}</label>
+                            {{ form.etat }}
+                        </div>
+                    </div> 
+                {% endfor %} 
+                <div class="mt-2 text-center">
+                    <button type="submit" class="btn btn-primary col-md-3">Enregistrer les Pièces</button> 
+                    <a href="{% url 'tache_effectue'%}" class="btn btn-secondary col-md-3">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 
+
+{% endblock %}

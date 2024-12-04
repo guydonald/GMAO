@@ -1,0 +1,26 @@
+{% extends "maintenance.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-dark text-center">Ceci sont vos tâches effectues {{ user.username }}</h2>
+    <p class="text-dark text-center">Nombre d'ordres de travail récupérés : {{ orderwork.count }}</p>
+    <table class="table table-white table-striped-columns"> 
+        <thead> 
+            <tr class="table-dark">
+                <th>Code</th> 
+                <th>Heure de Début</th> 
+                <th>Heure de Fin</th> 
+            </tr> 
+        </thead> 
+        <tbody> 
+            {% for order in orderwork %} 
+            <tr> 
+                <td><a href="{% url 'faire_rapport' order.code %}">{{ order.code }}</a></td> 
+                <td>{{ order.heure_debut }}</td> 
+                <td>{{ order.heure_fin }}</td> 
+            </tr> 
+            {% endfor %} 
+        </tbody> 
+    </table>
+</div>
+{% endblock %}

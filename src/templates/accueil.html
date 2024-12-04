@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  <title>Gestion UMS</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css" />
+  <!-- Google Fonts Roboto -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
+  <!-- MDB -->
+  <link rel="stylesheet" href="{% static 'css/mdb.min.css'%}" />
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+
+<body>
+  
+    
+
+  <center>
+    <h1 class="display-1" style="color: #113A60; margin-top: 150px;">Welcome-to</h1>
+    <img src="{% static 'css/logo1.jpg'%}" alt="" style="height: 300px;width: 300px; border-radius: 40%; margin-bottom: 40px;margin-top: 20px;"><br>
+    <a href="{% url 'login' %}" class="btn btn-success p-4" style="font-size: 30px;">Se connecter</a>
+  </center>
+  
+
+  <script type="text/javascript" src="{% static 'js/mdb.umd.min.js'%}"></script>
+  <script src="{% static 'js/htmx.min.js' %}"></script>
+</body>
+
+</html>
